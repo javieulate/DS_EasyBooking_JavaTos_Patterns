@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="launch.client.vodafone" name="4.1_SMS_C-and-SL_Client">
+	<property environment="env"/>
+	<property name="source.dir" location="src"/>
+   	<property name="build.dir" location="bin"/>
+	<property name="lib.dir" location="lib"/>
+	<property name="vodafone.port" value="1099"/>
+	<property name="movistar.port" value="65000"/>
+	<property name="rmiregistry.IP" value="127.0.0.1"/> 
+	<property name="vodafone.server.name" value="Vodafone"/>
+	<property name="movistar.server.name" value="Movistar"/>
+	<property name="policy.file" location="security/java.policy"/>	
+
+	<path id="classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <pathelement location="${build.dir}"/>    	
+    </path>
+	
+	<target name="compile" description="Builds the project">
+		<delete dir="${build.dir}"/>
+		<mkdir dir="${build.dir}"/>
+		<javac srcdir="${source.dir}" destdir="${build.dir}" classpathref="classpath" deprecation="true" fork="true" includeantruntime="no"/>
+    </target>
+    
+	<target name="launch.client.vodafone" depends="compile"  description="Runs Client program">
+		<java classname="es.deusto.ingenieria.sd.sms.client.controller.SMSController" classpathref="classpath" fork="true">
+			<jvmarg value="-Djava.security.policy=${policy.file}"/>			
+        	<arg value="${rmiregistry.IP}"/> 
+	 		<arg value="${vodafone.port}"/> 
+			<arg value="${vodafone.server.name}"/> 
+        </java>
+    </target>
+	
+	<target name="launch.client.movistar" depends="compile"  description="Runs Client program">
+		<java classname="es.deusto.ingenieria.sd.sms.client.controller.SMSController" classpathref="classpath" fork="true">
+			<jvmarg value="-Djava.security.policy=${policy.file}"/>			
+        	<arg value="${rmiregistry.IP}"/> 
+	 		<arg value="${movistar.port}"/> 
+			<arg value="${movistar.server.name}"/> 
+        </java>
+    </target>
+
+	<target name="enhance-classes" depends="compile" description="Adds JDO code to the persisten compiled classes">
+	    	<taskdef name="enhancer" classpathref="classpath" classname="org.datanucleus.enhancer.EnhancerTask"/>
+	   		<enhancer classpathref="classpath" failonerror="true">
+	            <sysproperty key="log4j.configuration" value="file:${resources.dir}/log4j.properties"/>
+	            <fileset dir="${bin.dir}">
+	                <include name="**/*.class"/>
+	            </fileset>
+	   		</enhancer>
+	    </target>
+
+	    <target name="create-db-schema" depends="enhance-classes" description="Creates DB Schema on the DB Server">
+	        <taskdef name="schematool" classpathref="classpath" classname="org.datanucleus.store.schema.SchemaToolTask"/>
+	    	<schematool mode="create" classpathref="classpath" props="datanucleus.properties" failonerror="true">
+	            <sysproperty key="log4j.configuration" value="file:${resources.dir}/log4j.properties"/>
+	            <fileset dir="${bin.dir}">
+	                <include name="**/*.class"/>
+	            </fileset>
+	        </schematool>
+	    </target>
+		
+		<target name="run" description="Runs a local test of the Server">
+	        <java classname="es.deusto.ingenieria.sd.jdo.accounts.Main" classpathref="classpath" fork="true">
+	        	<jvmarg value="-Dlog4j.configuration=log4j.properties"/>
+			</java>
+	    </target>
+		
+		<target name="delete-db-schema" depends="enhance-classes" description="Drops DB sechema from the DB Server">
+			<taskdef name="schematool" classpathref="classpath" classname="org.datanucleus.store.schema.SchemaToolTask"/>
+	    	<schematool mode="delete" classpathref="classpath" props="datanucleus.properties" failonerror="true">            
+	    	   	<sysproperty key="log4j.configuration" value="file:${resources.dir}/log4j.properties"/>
+	    	 	<fileset dir="${bin.dir}">
+	           		<include name="**/*.class"/>
+	            </fileset>
+	        </schematool>
+		</target>
+</project>
