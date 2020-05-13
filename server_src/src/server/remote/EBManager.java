@@ -3,6 +3,7 @@ package src.server.remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.toedter.calendar.JDateChooser;
 
@@ -48,7 +49,7 @@ public class EBManager extends UnicastRemoteObject implements IEBManager{
 	}
 
 	@Override
-	public void introducirPersonasReserva(int dni, String nombre, String apellidos) throws RemoteException {
+	public void introducirPersonaReserva(int dni, String nombre, String apellidos) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 	}

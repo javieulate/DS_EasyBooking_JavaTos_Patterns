@@ -36,11 +36,11 @@ public class EBController {
 			System.err.println("$ Error iniciando sesion: " + e.toString());		}
 	}
 
-	public void introducirPersonasReserva(int dni, String nombre, String apellidos)
+	public void introducirPersonaReserva(int dni, String nombre, String apellidos)
 	{
 		ieb = rsl.getService();
 		try {
-			ieb.introducirPersonasReserva(dni, nombre, apellidos);
+			ieb.introducirPersonaReserva(dni, nombre, apellidos);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			System.err.println("$ Error al introducir personas en la reserva: " + e.toString());		
